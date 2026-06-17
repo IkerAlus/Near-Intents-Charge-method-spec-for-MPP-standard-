@@ -9,9 +9,9 @@ submissiontype: independent
 consensus: false
 
 author:
-  - name: Ikertxo Alustiza
+  - name: Iker Alustiza
     ins: I. Alustiza
-    email: "TODO-REPLACE@nearone.xyz"
+    email: "iker.alustiza@nearone.org"
     org: Near One
 
 normative:
@@ -541,16 +541,6 @@ offer webhook notification instead of holding the connection open;
 specifying such an asynchronous delivery mechanism is otherwise out of
 scope for this document.
 
-## Settlement Atomicity {#atomicity}
-
-The swap leg executes atomically on the NEAR Intents settlement layer, but
-the end-to-end flow spans deposit, swap, and delivery. The server only ever
-observes terminal states; intermediate states never grant access. There is
-no terminal state in which the client has paid, the merchant has not been
-paid, and no refund is issued: every non-`SUCCESS` terminal status results
-in a refund to `methodDetails.refundTo`. This refund is performed by the
-settlement backend and is not an in-protocol guarantee of the Payment
-authentication scheme (see {{trust}}).
 
 # Receipt {#receipt}
 
@@ -674,14 +664,6 @@ deposited asset, not origin-chain fees. Servers do not advance funds in
 this method and therefore do not carry the fee-sponsorship denial-of-service
 exposure of server-submitted flows, but servers SHOULD still rate-limit
 challenge issuance and verification attempts per {{I-D.httpauth-payment}}.
-
-## RPC and Backend Trust
-
-Servers rely on their origin-chain RPC endpoint and on the 1Click status
-endpoint for verification and settlement data. A compromised endpoint could
-return fabricated data. Servers SHOULD use trusted providers or run their
-own infrastructure, and SHOULD corroborate the deposit across the
-origin-chain RPC and the backend status where practical.
 
 ## Idempotency and Side Effects
 
