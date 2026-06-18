@@ -655,16 +655,6 @@ non-success terminal state refunds the deposit. Clients and autonomous
 agents applying per-method risk policies can identify this trust model from
 the `method` (`nearintents`) and `methodDetails.settlementBackend`.
 
-## Settlement Failure and Fee Exposure
-
-Because the client pays the origin-chain network fee itself and deposits
-before settlement, a swap that ends in refund leaves the client having paid
-that network fee without obtaining the resource; the refund covers the
-deposited asset, not origin-chain fees. Servers do not advance funds in
-this method and therefore do not carry the fee-sponsorship denial-of-service
-exposure of server-submitted flows, but servers SHOULD still rate-limit
-challenge issuance and verification attempts per {{I-D.httpauth-payment}}.
-
 ## Idempotency and Side Effects
 
 Per {{I-D.httpauth-payment}}, servers MUST NOT perform side effects for
