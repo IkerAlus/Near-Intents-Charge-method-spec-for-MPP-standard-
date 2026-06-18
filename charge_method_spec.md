@@ -2,7 +2,7 @@
 title: "NEAR Intents Charge Intent for HTTP Payment Authentication"
 abbrev: "NEAR Intents Charge"
 docname: draft-nearintents-charge-00
-version: 0
+version: 00
 category: info
 ipr: noModificationTrust200902
 submissiontype: independent
@@ -66,6 +66,7 @@ informative:
     target: https://docs.near-intents.org/resources/chain-support
     author:
       - org: NEAR Intents
+---
 
 --- abstract
 
@@ -250,9 +251,9 @@ USDC).
 # Request Schema {#request-schema}
 
 The `request` parameter in the `WWW-Authenticate` challenge contains a
-base64url-encoded JSON object. The JSON MUST be serialized using JSON
-Canonicalization Scheme (JCS) {{RFC8785}} before base64url encoding, per
-{{I-D.httpauth-payment}}.
+base64url-encoded {{RFC4648}} JSON {{RFC8259}} object. The JSON MUST be
+serialized using JSON Canonicalization Scheme (JCS) {{RFC8785}} before
+base64url encoding, per {{I-D.httpauth-payment}}.
 
 This specification implements the shared request fields defined in
 {{I-D.payment-intent-charge}}.
@@ -406,8 +407,7 @@ quote deadline accommodates origin-chain confirmation plus
 `methodDetails.timeEstimate`. Because the deposit address is time-limited,
 servers SHOULD cache the challenge for a given resource until the quote
 deadline and reissue the same challenge (including the same `recipient`)
-for repeated requests, regenerating only when the deadline passes (see
-{{quote-generation}}).
+for repeated requests, regenerating only when the deadline passes.
 
 # Challenge Binding {#challenge-binding}
 
@@ -683,7 +683,7 @@ Methods" registry established by {{I-D.httpauth-payment}}:
 | ----------------- | ------------------------------------------------------------------------ | ------------- |
 | `nearintents`     | Cross-chain payment settled via the NEAR Intents 1Click Swap API         | This document |
 
-Contact: Near One (Ikertxo Alustiza).
+Contact: Iker Alustiza (iker.alustiza@nearone.org)
 
 ## Payment Intent Registration
 
@@ -878,5 +878,5 @@ credential per {{I-D.httpauth-payment}}.
 # Acknowledgements
 
 The author thanks the Tempo Labs and Stripe teams for the Machine Payments
-Protocol framework, and the NEAR Intents and Near One teams for the 1Click
+Protocol framework, and the NEAR Intents teams for the 1Click
 Swap settlement system.
