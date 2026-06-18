@@ -71,14 +71,14 @@ informative:
 --- abstract
 
 This document defines the "charge" intent for the "nearintents" payment
-method in the Payment HTTP Authentication Scheme {{I-D.httpauth-payment}}.
-It specifies how clients and servers exchange one-time, cross-chain
-payments settled through the NEAR Intents 1Click Swap API {{ONECLICK-API}},
-in which a client pays a specified amount of a source asset on any
-supported origin chain and the resource server (merchant) receives an
-exact amount of a destination asset on any supported destination chain,
-with the NEAR Intents solver network executing the cross-chain swap in
-between.
+method in the Payment HTTP Authentication Scheme
+{{I-D.httpauth-payment}}. It specifies how clients and servers exchange
+one-time, cross-chain payments settled through the NEAR Intents 1Click
+Swap API {{ONECLICK-API}}, in which a client pays a specified amount of
+a source asset on any supported origin chain and the resource server
+(merchant) receives an exact amount of a destination asset on any
+supported destination chain, with the NEAR Intents solver network
+executing the cross-chain swap in between.
 
 One credential type is supported: `type="hash"` (push mode), where the
 client broadcasts the deposit transaction to the origin chain itself and
@@ -103,29 +103,29 @@ API {{ONECLICK-API}} is a hosted interface to this system: a caller
 requests a quote for converting a source asset into a destination asset,
 receives a unique deposit address on the origin chain, sends the source
 asset to that address, and the solver network delivers the destination
-asset to a specified recipient — potentially on a different chain.
-A list of supported origin and destination chains is maintained at
+asset to a specified recipient — potentially on a different chain. A
+list of supported origin and destination chains is maintained at
 {{NEAR-INTENTS-CHAINS}}.
 
 This document specifies how to use that settlement system to fulfill the
 "charge" intent: a one-time payment of a specified amount, as defined in
-{{I-D.payment-intent-charge}}. The server may settle the payment any time
-before the challenge `expires` auth-param timestamp.
+{{I-D.payment-intent-charge}}. The server may settle the payment any
+time before the challenge `expires` auth-param timestamp.
 
 This specification inherits the shared request semantics of the "charge"
 intent from {{I-D.payment-intent-charge}}. It defines only the NEAR
-Intents-specific `methodDetails`, `payload`, verification, and settlement
-procedures for the "nearintents" payment method.
+Intents-specific `methodDetails`, `payload`, verification, and
+settlement procedures for the "nearintents" payment method.
 
 ## Push Mode {#push-mode}
 
-This method uses a single settlement flow, called "push mode", which uses
-`type="hash"` credentials. The client "pushes" the deposit transaction to
-the origin chain itself and presents the confirmed transaction hash; the
-server verifies the deposit and then drives the cross-chain swap to
-completion.
+This method uses a single settlement flow, called "push mode", which
+uses `type="hash"` credentials. The client "pushes" the deposit
+transaction to the origin chain itself and presents the confirmed
+transaction hash; the server verifies the deposit and then drives the
+cross-chain swap to completion.
 
-```
+~~~
 Client                  Server            Origin Chain      1Click / Solvers
   |                        |                    |                  |
   | (1) GET /resource      |                    |                  |
@@ -155,7 +155,7 @@ Client                  Server            Origin Chain      1Click / Solvers
   |                        |<--------------------------------------|
   | (9) 200 OK + Receipt   |                    |                  |
   |<-----------------------|                    |                  |
-```
+~~~
 
 Unlike methods that offer a server-submitted ("pull") flow for fee
 sponsorship, this method has no pull mode: the source asset must be
@@ -163,20 +163,20 @@ deposited to the 1Click address before settlement can begin, and the
 client therefore always pays its own origin-chain network fee. A future
 revision MAY define an additional credential type for clients that hold
 balances on the NEAR Intents settlement layer and wish to delegate
-submission of a signed intent; such a credential is out of scope for this
-document.
+submission of a signed intent; such a credential is out of scope for
+this document.
 
 ## Cross-Chain Settlement Model {#cross-chain-model}
 
 Single-chain charge methods describe one transfer: the client sends
-`amount` of `currency` to `recipient`, and the recipient receives exactly
-that. This method describes a payment whose two sides may diverge across
-chains and assets.
+`amount` of `currency` to `recipient`, and the recipient receives
+exactly that. This method describes a payment whose two sides may
+diverge across chains and assets.
 
 To remain compatible with the shared "charge" request schema and with
 push-mode verification, the standard fields describe the **payment the
-client makes on the origin chain**, and the **merchant's destination leg**
-is carried in `methodDetails`:
+client makes on the origin chain**, and the **merchant's destination
+leg** is carried in `methodDetails`:
 
 - `recipient` is the 1Click **deposit address** on the origin chain. It is
   the payee of the client's on-chain transfer and the address whose
@@ -192,15 +192,16 @@ is carried in `methodDetails`:
   describe the asset, chain, beneficiary, and exact amount the **merchant**
   receives once the swap completes.
 
-This mapping keeps push-mode verification — "confirm an on-chain transfer
-of `amount` `currency` to `recipient`" — directly applicable: the verified
-transfer is the deposit, and the cross-chain swap is an extension that
-executes after the verified payment and delivers to the merchant.
+This mapping keeps push-mode verification — "confirm an on-chain
+transfer of `amount` `currency` to `recipient`" — directly applicable:
+the verified transfer is the deposit, and the cross-chain swap is an
+extension that executes after the verified payment and delivers to the
+merchant.
 
 ## Relationship to the Charge Intent
 
-This document inherits the shared request semantics of the "charge" intent
-from {{I-D.payment-intent-charge}}. It defines only the NEAR
+This document inherits the shared request semantics of the "charge"
+intent from {{I-D.payment-intent-charge}}. It defines only the NEAR
 Intents-specific `methodDetails`, `payload`, and verification procedures
 for the "nearintents" payment method.
 
@@ -273,8 +274,8 @@ Challenge expiry is conveyed by the `expires` auth-param in
 
 ## Asset Identifiers {#asset-identifiers}
 
-The format of `currency` (and of `methodDetails.destinationAsset`) depends
-on the chain:
+The format of `currency` (and of `methodDetails.destinationAsset`)
+depends on the chain:
 
 | Chain type                         | Identifier format                | Example                                                            |
 | ---------------------------------- | -------------------------------- | ------------------------------------------------------------------ |
@@ -284,8 +285,8 @@ on the chain:
 | Native assets without a contract   | CAIP-19 {{CAIP-19}} asset id     | `bip122:000000000019d6689c085ae165831e93/slip44:0` (BTC)          |
 
 Implementations MUST NOT use informal short identifiers (e.g., `"arb"`,
-`"BTC"`) in `currency` or `destinationAsset`. Addresses MUST be compared by
-their decoded value, not by string form.
+`"BTC"`) in `currency` or `destinationAsset`. Addresses MUST be compared
+by their decoded value, not by string form.
 
 ## Method Details
 
@@ -305,12 +306,12 @@ their decoded value, not by string form.
 | `methodDetails.credentialTypes`  | array   | OPTIONAL | Ordered list of accepted credential types. For this method, the only valid value is `"hash"`.        |
 
 If `methodDetails.credentialTypes` is omitted, servers MUST accept
-`"hash"`. Servers MUST NOT advertise credential types other than `"hash"`
-for this method.
+`"hash"`. Servers MUST NOT advertise credential types other than
+`"hash"` for this method.
 
 **Example (decoded `request`):**
 
-```
+~~~json
 {
   "amount": "1005000",
   "currency": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
@@ -332,16 +333,16 @@ for this method.
     "credentialTypes": ["hash"]
   }
 }
-```
+~~~
 
-This requests a deposit of 1.005 USDC on Arbitrum (`eip155:42161`) so that
-the merchant receives exactly 1.00 of the destination asset on NEAR
+This requests a deposit of 1.005 USDC on Arbitrum (`eip155:42161`) so
+that the merchant receives exactly 1.00 of the destination asset on NEAR
 (`near:mainnet`).
 
 # Credential Schema {#credential-schema}
 
-The credential in the `Authorization` header contains a base64url-encoded
-JSON object per {{I-D.httpauth-payment}}.
+The credential in the `Authorization` header contains a
+base64url-encoded JSON object per {{I-D.httpauth-payment}}.
 
 ## Credential Structure
 
@@ -351,29 +352,29 @@ JSON object per {{I-D.httpauth-payment}}.
 | `payload`   | object | REQUIRED | NEAR Intents-specific payload (see {{hash-payload}}).                                   |
 | `source`    | string | OPTIONAL | Payer DID.                                                                             |
 
-The `source` field, if present, SHOULD use the `did:pkh` method {{DID-PKH}}
-with the CAIP-2 origin network identifier and the payer's origin-chain
-address (e.g., `did:pkh:eip155:42161:0x2527...`).
+The `source` field, if present, SHOULD use the `did:pkh` method
+{{DID-PKH}} with the CAIP-2 origin network identifier and the payer's
+origin-chain address (e.g., `did:pkh:eip155:42161:0x2527...`).
 
 ## Hash Payload — Push Mode (type="hash") {#hash-payload}
 
-In push mode, the client has already broadcast the deposit transaction to
-the origin chain. The `hash` field contains the transaction hash for the
-server to verify.
+In push mode, the client has already broadcast the deposit transaction
+to the origin chain. The `hash` field contains the transaction hash for
+the server to verify.
 
 | Field  | Type   | Presence | Description                                                            |
 | ------ | ------ | -------- | ---------------------------------------------------------------------- |
 | `type` | string | REQUIRED | `"hash"`                                                               |
 | `hash` | string | REQUIRED | Transaction hash of the client's deposit on the origin chain (`methodDetails.network`). Format is origin-chain-native. |
 
-The address the deposit must pay is not repeated in the payload: it is the
-challenge `recipient`, which is bound into the challenge `id`
-(see {{challenge-binding}}). The server resolves which deposit to verify
-from the echoed challenge.
+The address the deposit must pay is not repeated in the payload: it is
+the challenge `recipient`, which is bound into the challenge `id` (see
+{{challenge-binding}}). The server resolves which deposit to verify from
+the echoed challenge.
 
 **Example:**
 
-```
+~~~json
 {
   "challenge": {
     "id": "qB3wErTyU7iOpAsD9fGhJk",
@@ -389,55 +390,60 @@ from the echoed challenge.
   },
   "source": "did:pkh:eip155:42161:0x2527D02599Ba641c19FEa793cD0F9a6e8457C317"
 }
-```
+~~~
 
 # Challenge Expiry and Deposit Deadline {#expiry}
 
-The challenge `expires` auth-param ({{I-D.httpauth-payment}}) MUST be set
-to the 1Click quote deadline, or to a slightly earlier time, so that a
-deposit made before `expires` is still within the quote's validity window.
+The challenge `expires` auth-param ({{I-D.httpauth-payment}}) MUST be
+set to the 1Click quote deadline, or to a slightly earlier time, so that
+a deposit made before `expires` is still within the quote's validity
+window.
 
 Clients MUST NOT broadcast a deposit transaction after the challenge
 `expires` timestamp. A deposit that arrives at the deposit address after
-the quote deadline may be refunded to `methodDetails.refundTo` rather than
-swapped.
+the quote deadline may be refunded to `methodDetails.refundTo` rather
+than swapped.
 
 Servers SHOULD set `expires` such that the remaining window before the
 quote deadline accommodates origin-chain confirmation plus
-`methodDetails.timeEstimate`. Because the deposit address is time-limited,
-servers SHOULD cache the challenge for a given resource until the quote
-deadline and reissue the same challenge (including the same `recipient`)
-for repeated requests, regenerating only when the deadline passes.
+`methodDetails.timeEstimate`. Because the deposit address is
+time-limited, servers SHOULD cache the challenge for a given resource
+until the quote deadline and reissue the same challenge (including the
+same `recipient`) for repeated requests, regenerating only when the
+deadline passes.
 
 # Challenge Binding {#challenge-binding}
 
-The challenge `id` binds the challenge parameters per {{I-D.httpauth-payment}},
-including `request`, which carries `recipient` (the deposit address),
-`amount`, and `currency`. Servers MUST verify that the credential echoes a
-challenge whose recomputed binding matches the `id` they issued
-(for example, via the HMAC-SHA256 mechanism in {{I-D.httpauth-payment}}),
-and MUST reject credentials presenting an unknown, expired, modified, or
-already-settled `id`.
+The challenge `id` binds the challenge parameters per
+{{I-D.httpauth-payment}}, including `request`, which carries `recipient`
+(the deposit address), `amount`, and `currency`. Servers MUST verify
+that the credential echoes a challenge whose recomputed binding matches
+the `id` they issued (for example, via the HMAC-SHA256 mechanism in
+{{I-D.httpauth-payment}}), and MUST reject credentials presenting an
+unknown, expired, modified, or already-settled `id`.
 
-Because the 1Click backend issues a **unique deposit address per quote**,
-the `recipient` in each challenge is challenge-specific. A deposit
-transaction observed at that address is therefore implicitly bound to the
-single challenge that advertised it — an attacker cannot present the same
-deposit against a different challenge, because a different challenge has a
-different `recipient`. This gives push mode under this method a stronger
-practical binding than hash credentials whose recipient is a static
-merchant address shared across many challenges. See {{hash-binding}}.
+Because the 1Click backend issues a **unique deposit address per
+quote**, the `recipient` in each challenge is challenge-specific. A
+deposit transaction observed at that address is therefore implicitly
+bound to the single challenge that advertised it — an attacker cannot
+present the same deposit against a different challenge, because a
+different challenge has a different `recipient`. This gives push mode
+under this method a stronger practical binding than hash credentials
+whose recipient is a static merchant address shared across many
+challenges. See {{hash-binding}}.
 
 # Verification {#verification}
 
-Upon receiving a request with a credential, the server MUST first validate
-that `payload.type` is `"hash"`, then perform the following checks. If any
-check fails, the server MUST return a `verification-failed` error per
-{{I-D.httpauth-payment}} (or a more specific code from {{error-codes}}).
+Upon receiving a request with a credential, the server MUST first
+validate that `payload.type` is `"hash"`, then perform the following
+checks. If any check fails, the server MUST return a
+`verification-failed` error per {{I-D.httpauth-payment}} (or a more
+specific code from {{error-codes}}).
 
-If the origin-chain RPC or the 1Click status endpoint is unavailable for a
-required check, servers MUST treat this as a server error (HTTP 5xx) rather
-than a `verification-failed` response, and MUST NOT settle the credential.
+If the origin-chain RPC or the 1Click status endpoint is unavailable for
+a required check, servers MUST treat this as a server error (HTTP 5xx)
+rather than a `verification-failed` response, and MUST NOT settle the
+credential.
 
 1. The challenge `id` matches an outstanding, unsettled challenge issued by
    this server, the recomputed challenge binding matches `id`
@@ -468,8 +474,8 @@ only after that delivery completes.
 
 # Error Codes {#error-codes}
 
-This specification defines the following additional error code beyond those
-in {{I-D.httpauth-payment}}:
+This specification defines the following additional error code beyond
+those in {{I-D.httpauth-payment}}:
 
 | Code                | HTTP | Description                                                                 |
 | ------------------- | ---- | --------------------------------------------------------------------------- |
@@ -487,9 +493,9 @@ Other failure conditions map to the standard problem types of
 | Swap failed or refunded after a verified deposit       | `settlement-failed`     |
 | Credential malformed (bad base64url or JSON)           | `malformed-credential`  |
 
-As required by {{I-D.httpauth-payment}}, every rejection returns HTTP 402
-with a fresh `WWW-Authenticate: Payment` challenge and a Problem Details
-{{RFC9457}} body with `Content-Type: application/problem+json`.
+As required by {{I-D.httpauth-payment}}, every rejection returns HTTP
+402 with a fresh `WWW-Authenticate: Payment` challenge and a Problem
+Details {{RFC9457}} body with `Content-Type: application/problem+json`.
 
 # Settlement Procedure {#settlement}
 
@@ -517,11 +523,11 @@ before granting access. The server:
 
 ## Settlement Finality {#finality}
 
-This method has two candidate finality boundaries: (a) confirmation of the
-client's deposit on the origin chain, and (b) delivery of the destination
-asset to the merchant. This method defines finality as **(b) destination
-delivery** (1Click terminal status `SUCCESS`). The server MUST NOT return a
-`Payment-Receipt` before `SUCCESS`.
+This method has two candidate finality boundaries: (a) confirmation of
+the client's deposit on the origin chain, and (b) delivery of the
+destination asset to the merchant. This method defines finality as **(b)
+destination delivery** (1Click terminal status `SUCCESS`). The server
+MUST NOT return a `Payment-Receipt` before `SUCCESS`.
 
 Per-origin-chain confirmation depth (boundary a) is a policy of the
 settlement backend: the 1Click backend applies chain-appropriate
@@ -544,9 +550,9 @@ scope for this document.
 
 # Receipt {#receipt}
 
-Upon successful settlement, servers MUST return a `Payment-Receipt` header
-per {{I-D.httpauth-payment}}. Servers MUST NOT include a `Payment-Receipt`
-header on error responses.
+Upon successful settlement, servers MUST return a `Payment-Receipt`
+header per {{I-D.httpauth-payment}}. Servers MUST NOT include a
+`Payment-Receipt` header on error responses.
 
 The receipt payload fields:
 
@@ -563,7 +569,7 @@ The receipt payload fields:
 
 **Example (decoded):**
 
-```
+~~~json
 {
   "method": "nearintents",
   "challengeId": "qB3wErTyU7iOpAsD9fGhJk",
@@ -574,7 +580,7 @@ The receipt payload fields:
   "destinationNetwork": "near:mainnet",
   "externalId": "order_12345"
 }
-```
+~~~
 
 # Replay Protection {#replay}
 
@@ -591,27 +597,30 @@ method enforces replay protection on two layers:
   After successful verification, the server MUST atomically mark the hash as
   consumed.
 
-When a single origin transaction is one of several deposits aggregated by
-the backend to one address (e.g., a top-up after an under-deposit), each
-individual transaction hash remains single-use; the server MAY accept any
-one qualifying hash provided the aggregate meets `methodDetails.minAmountIn`.
+When a single origin transaction is one of several deposits aggregated
+by the backend to one address (e.g., a top-up after an under-deposit),
+each individual transaction hash remains single-use; the server MAY
+accept any one qualifying hash provided the aggregate meets
+`methodDetails.minAmountIn`.
 
 Servers MUST also satisfy the concurrency requirement of
-{{I-D.httpauth-payment}}: concurrent requests bearing the same credential
-MUST result in at most one settlement and one resource delivery.
+{{I-D.httpauth-payment}}: concurrent requests bearing the same
+credential MUST result in at most one settlement and one resource
+delivery.
 
 # Security Considerations {#security}
 
 ## Transport Security
 
-All communication MUST use TLS 1.2 or higher per {{I-D.httpauth-payment}}.
-Credentials and receipts MUST only be transmitted over HTTPS connections.
+All communication MUST use TLS 1.2 or higher per
+{{I-D.httpauth-payment}}. Credentials and receipts MUST only be
+transmitted over HTTPS connections.
 
 ## Amount and Asset Verification
 
-Before broadcasting a deposit, clients MUST decode and verify the challenge
-`request` per {{I-D.httpauth-payment}}: that `amount`, `currency`, and
-`recipient` (the deposit address) are as expected, that
+Before broadcasting a deposit, clients MUST decode and verify the
+challenge `request` per {{I-D.httpauth-payment}}: that `amount`,
+`currency`, and `recipient` (the deposit address) are as expected, that
 `methodDetails.network` is the intended origin chain, and that the
 destination leg (`destinationNetwork`, `destinationAsset`,
 `destinationRecipient`, `amountOut`) matches what the client intends the
@@ -623,23 +632,23 @@ Hash credentials generally provide weaker challenge binding than
 signature-based credentials: the server confirms a matching on-chain
 payment exists but, for a static recipient, cannot prove the payment was
 created for a specific challenge instance. Under this method that gap is
-narrowed by the unique-per-quote deposit address: the `recipient` is itself
-challenge-specific and is bound into the challenge `id`
-({{challenge-binding}}), so a deposit observed at that address is bound to
-the one challenge that advertised it. Servers nonetheless MUST enforce
-consumed-hash tracking ({{replay}}) and MUST reject credentials referencing
-an unknown, expired, or settled challenge, and SHOULD use unique
-`externalId` values per challenge.
+narrowed by the unique-per-quote deposit address: the `recipient` is
+itself challenge-specific and is bound into the challenge `id`
+({{challenge-binding}}), so a deposit observed at that address is bound
+to the one challenge that advertised it. Servers nonetheless MUST
+enforce consumed-hash tracking ({{replay}}) and MUST reject credentials
+referencing an unknown, expired, or settled challenge, and SHOULD use
+unique `externalId` values per challenge.
 
 ## Deposit Address Authenticity
 
-Servers MUST only advertise deposit addresses obtained from authenticated
-calls to the 1Click API, and MUST NOT relay deposit addresses from
-untrusted sources. Because the client pays before learning whether the
-resource will be delivered, clients SHOULD apply heightened scrutiny to the
-server's identity (origin, TLS certificate) before depositing, and
-browser-based wallets SHOULD require explicit user confirmation per
-{{I-D.httpauth-payment}}.
+Servers MUST only advertise deposit addresses obtained from
+authenticated calls to the 1Click API, and MUST NOT relay deposit
+addresses from untrusted sources. Because the client pays before
+learning whether the resource will be delivered, clients SHOULD apply
+heightened scrutiny to the server's identity (origin, TLS certificate)
+before depositing, and browser-based wallets SHOULD require explicit
+user confirmation per {{I-D.httpauth-payment}}.
 
 ## Trust Model {#trust}
 
@@ -647,13 +656,14 @@ Settlement in this method is **not trustless**. For the duration of the
 swap, the deposited funds are custodied by the NEAR Intents settlement
 system, which is trusted to either deliver the destination asset to the
 merchant or refund the deposit to `methodDetails.refundTo`. The
-`recipient` (deposit address) ↔ merchant pairing is fixed in the quote and
-is enforced by the backend, not by an on-chain contract that the client
-co-signs. This is comparable to entrusting a payment processor with a
-transfer. The automatic refund path bounds the client's downside: every
-non-success terminal state refunds the deposit. Clients and autonomous
-agents applying per-method risk policies can identify this trust model from
-the `method` (`nearintents`) and `methodDetails.settlementBackend`.
+`recipient` (deposit address) ↔ merchant pairing is fixed in the quote
+and is enforced by the backend, not by an on-chain contract that the
+client co-signs. This is comparable to entrusting a payment processor
+with a transfer. The automatic refund path bounds the client's downside:
+every non-success terminal state refunds the deposit. Clients and
+autonomous agents applying per-method risk policies can identify this
+trust model from the `method` (`nearintents`) and
+`methodDetails.settlementBackend`.
 
 ## Idempotency and Side Effects
 
@@ -666,14 +676,14 @@ second settlement.
 
 ## Payment Method Registration
 
-This document registers the following payment method in the "HTTP Payment
-Methods" registry established by {{I-D.httpauth-payment}}:
+This document registers the following payment method in the "HTTP
+Payment Methods" registry established by {{I-D.httpauth-payment}}:
 
 | Method Identifier | Description                                                              | Reference     |
 | ----------------- | ------------------------------------------------------------------------ | ------------- |
 | `nearintents`     | Cross-chain payment settled via the NEAR Intents 1Click Swap API         | This document |
 
-Contact: Iker Alustiza (iker.alustiza@nearone.org)
+Contact: Iker Alustiza (iker.alustiza@nearone.org).
 
 ## Payment Intent Registration
 
@@ -688,7 +698,7 @@ Payment Intents" registry established by {{I-D.httpauth-payment}}:
 
 # ABNF Collected
 
-```
+~~~abnf
 nearintents-charge-challenge = "Payment" 1*SP
   "id=" quoted-string ","
   "realm=" quoted-string ","
@@ -701,7 +711,7 @@ nearintents-charge-credential = "Payment" 1*SP base64url-nopad
 
 ; Base64url encoding without padding per RFC 4648 Section 5
 base64url-nopad = 1*( ALPHA / DIGIT / "-" / "_" )
-```
+~~~
 
 # Examples
 
@@ -709,7 +719,7 @@ base64url-nopad = 1*( ALPHA / DIGIT / "-" / "_" )
 
 **1. Challenge (402 response):**
 
-```
+~~~http
 HTTP/1.1 402 Payment Required
 Cache-Control: no-store
 Content-Type: application/problem+json
@@ -726,11 +736,11 @@ WWW-Authenticate: Payment id="qB3wErTyU7iOpAsD9fGhJk",
   "status": 402,
   "detail": "Payment required for access."
 }
-```
+~~~
 
 Decoded `request`:
 
-```
+~~~json
 {
   "amount": "1005000",
   "currency": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
@@ -752,22 +762,22 @@ Decoded `request`:
     "credentialTypes": ["hash"]
   }
 }
-```
+~~~
 
-The client sends 1.005 USDC to `0x76b4c560...` on Arbitrum, then presents
-the deposit hash.
+The client sends 1.005 USDC to `0x76b4c560...` on Arbitrum, then
+presents the deposit hash.
 
 **2. Credential:**
 
-```
+~~~http
 GET /resource HTTP/1.1
 Host: api.example.com
 Authorization: Payment eyJ...
-```
+~~~
 
 Decoded credential:
 
-```
+~~~json
 {
   "challenge": {
     "id": "qB3wErTyU7iOpAsD9fGhJk",
@@ -783,22 +793,22 @@ Decoded credential:
   },
   "source": "did:pkh:eip155:42161:0x2527D02599Ba641c19FEa793cD0F9a6e8457C317"
 }
-```
+~~~
 
 **3. Response (after swap reaches `SUCCESS`):**
 
-```
+~~~http
 HTTP/1.1 200 OK
 Cache-Control: private
 Payment-Receipt: eyJ...
 Content-Type: application/json
 
 {"data": "..."}
-```
+~~~
 
 Decoded receipt:
 
-```
+~~~json
 {
   "method": "nearintents",
   "challengeId": "qB3wErTyU7iOpAsD9fGhJk",
@@ -809,7 +819,7 @@ Decoded receipt:
   "destinationNetwork": "near:mainnet",
   "externalId": "order_12345"
 }
-```
+~~~
 
 ## Native BTC origin
 
@@ -818,7 +828,7 @@ window accommodates Bitcoin confirmation plus swap time.
 
 Decoded `request`:
 
-```
+~~~json
 {
   "amount": "38000",
   "currency": "bip122:000000000019d6689c085ae165831e93/slip44:0",
@@ -838,35 +848,36 @@ Decoded `request`:
     "credentialTypes": ["hash"]
   }
 }
-```
+~~~
 
 ## Multiple origin chains via Accept-Payment
 
-A client declares it can pay on Arbitrum or Bitcoin and prefers Arbitrum:
+A client declares it can pay on Arbitrum or Bitcoin and prefers
+Arbitrum:
 
-```
+~~~http
 GET /resource HTTP/1.1
 Host: api.example.com
 Accept-Payment: nearintents/charge
-```
+~~~
 
 The server MAY return several `nearintents/charge` challenges, each on a
-different origin `methodDetails.network` with its own `recipient` deposit
-address, allowing the client to choose:
+different origin `methodDetails.network` with its own `recipient`
+deposit address, allowing the client to choose:
 
-```
+~~~http
 HTTP/1.1 402 Payment Required
 Cache-Control: no-store
 WWW-Authenticate: Payment id="qB3wErTyU7iOpAsD9fGhJk", realm="api.example.com", method="nearintents", intent="charge", request="eyJ...arbitrum...", expires="2026-06-25T15:10:00Z"
 WWW-Authenticate: Payment id="nH6xJkLpO3qRtYsA6wDcVb", realm="api.example.com", method="nearintents", intent="charge", request="eyJ...bitcoin...", expires="2026-06-25T15:40:00Z"
-```
+~~~
 
-Each challenge corresponds to a distinct 1Click quote and deposit address.
-The client selects one and returns a single `Authorization: Payment`
-credential per {{I-D.httpauth-payment}}.
+Each challenge corresponds to a distinct 1Click quote and deposit
+address. The client selects one and returns a single `Authorization:
+Payment` credential per {{I-D.httpauth-payment}}.
 
 # Acknowledgements
 
-The author thanks the Tempo Labs and Stripe teams for the Machine Payments
-Protocol framework, and the NEAR Intents teams for the 1Click
-Swap settlement system.
+The author thanks the Tempo Labs and Stripe teams for the Machine
+Payments Protocol framework, and the NEAR Intents and Near One teams for
+the 1Click Swap settlement system.
