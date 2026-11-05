@@ -1,3 +1,3 @@
-# Near-Intents-Charge-method-spec-for-MPP-standard-
+# Near-Intents-Charge-specs-for-MPP-standards-
 
-proposed spec for Stripe's MPP standard based NEAR Intents Charge Intent.
+proposed spec for Stripe's MPP standard based NEAR Intents Charge and Session Intents.
