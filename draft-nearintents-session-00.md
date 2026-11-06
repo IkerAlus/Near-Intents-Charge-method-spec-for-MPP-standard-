@@ -94,12 +94,12 @@ informative:
       - org: NEAR Intents
   NEAR-INTENTS-VERIFIER:
     title: "NEAR Intents Verifier Contract"
-    target: https://github.com/near/intents
+    target: https://github.com/near/intents/tree/main/contracts/defuse
     author:
       - org: NEAR Intents
   NEAR-ACCOUNT-ID:
     title: "NEAR Protocol Account IDs"
-    target: https://docs.near.org/protocol/account-id
+    target: https://docs.near.org/protocol/accounts-contracts/account-id
     author:
       - org: NEAR Protocol
   SSE:
@@ -258,7 +258,7 @@ from a charge request.
 The actions defined in this document map to the abstract lifecycle
 operations of {{I-D.payment-intent-session}} as follows:
 
-| Abstract Operation | This Method's `action` | Proof |
+| Abstract Operation | Action | Proof |
 |--------------------|------------------------|-------|
 | Open | `open` | Deposit transaction hash, session-key signature, first voucher |
 | Use | `voucher` | Cumulative voucher signed by the session key |
@@ -358,7 +358,7 @@ This encoding convention applies to: the `request` auth-param in
 `WWW-Authenticate`, the credential token in `Authorization`, and the
 receipt token in `Payment-Receipt`.
 
-## Identifiers
+## Identifiers {#identifier-formats}
 
 Origin chains are identified by CAIP-2 {{CAIP-2}} identifiers. Assets
 are identified by CAIP-19 {{CAIP-19}} identifiers and compared as
@@ -589,7 +589,7 @@ unknown fields in request objects, credential payloads, and receipts.
 
 ## Echoed Challenge {#echoed-challenge}
 
-| Action | Echoed challenge | `expires` enforced |
+| Action | Echoed challenge | Expiry enforced |
 |--------|------------------|--------------------|
 | `open` | The challenge whose funding quote was paid | Yes |
 | `topUp` | A fresh challenge whose funding quote was paid | Yes |
@@ -656,11 +656,11 @@ Example credential (decoded):
   "payload": {
     "action": "open",
     "hash": "0x9bcff372aee89b648c922b850573b22387c31d693079f5e37cd255814e2d615a",
-    "sessionKey": "ed25519:B4EXH7JwWCA7G95uaLiCtTt3zLsanE4YNsbajuANGNAt",
-    "signature": "ed25519:4vJ9...Qd",
+    "sessionKey": "ed25519:FPMiwPws7RmVuqaAqqEwYNaVxf379PBvfmcqMisGbRai",
+    "signature": "ed25519:4Zgh...15",
     "voucher": {
       "cumulative": "1000",
-      "signature": "ed25519:3nR2...Kp"
+      "signature": "ed25519:4o66...AB"
     }
   },
   "source": "did:pkh:eip155:42161:0x2527D02599Ba641c19Fea793Cd0f9A6e8457c317"
@@ -707,7 +707,7 @@ Example credential (decoded):
     "action": "voucher",
     "reference": "eip155:42161:0x76b4c56085ED136a8744D52bE956396624a730E8",
     "cumulative": "25000",
-    "signature": "ed25519:5tWq...Hs"
+    "signature": "ed25519:3thD...re"
   }
 }
 ~~~
@@ -757,7 +757,7 @@ Example credential (decoded):
     "action": "topUp",
     "reference": "eip155:42161:0x76b4c56085ED136a8744D52bE956396624a730E8",
     "hash": "0x4d1e8a7c3b2f9e6d5c4b3a2918f7e6d5c4b3a29187f6e5d4c3b2a1908f7e6d5c",
-    "signature": "ed25519:2mFd...Zr"
+    "signature": "ed25519:5kTw...gH"
   }
 }
 ~~~
@@ -789,7 +789,7 @@ the form:
   "settlementRef": "7YkTGh2vN4qLm8RsE1dXfP5wZc9aJbKu3tHn6VgQ2eUo",
   "refund": {
     "type": "intents",
-    "account": "9568e6ae68a529facc3cf0366cce38ab1c67c4a744c9514c599bf6ef8f626679",
+    "account": "d5bdd38fe760603eaac6821bdc961e296708d2804911c663ea2c79ea581799c3",
     "amount": "3745130",
     "status": "succeeded"
   }
@@ -820,7 +820,7 @@ Example credential (decoded):
   "payload": {
     "action": "close",
     "reference": "eip155:42161:0x76b4c56085ED136a8744D52bE956396624a730E8",
-    "signature": "ed25519:6pLx...Wb"
+    "signature": "ed25519:3aw6...Um"
   }
 }
 ~~~
@@ -830,7 +830,7 @@ Example credential (decoded):
 The `refund` object of an `open` action selects where the unspent
 balance is sent at close.
 
-| `type` | Fields | Meaning |
+| Type | Fields | Meaning |
 |--------|--------|---------|
 | `"intents"` | `account` | Intents account identifier that receives the refund as a Verifier transfer. |
 | `"origin"` | `asset`, `address` | Refund handed to the 1Click backend as a swap into the CAIP-19 asset `asset` for `address` on that asset's chain. Allowed only when `methodDetails.refundTypes` contains `"origin"`. By selecting this type the payer accepts the swap fees and slippage, and the fallback to an `intents` refund at the session key's implicit account defined in {{origin-refunds}}. |
@@ -1474,7 +1474,7 @@ Example final receipt at close, after one top-up raised `funded` to
   "settlementRef": "7YkTGh2vN4qLm8RsE1dXfP5wZc9aJbKu3tHn6VgQ2eUo",
   "refund": {
     "type": "intents",
-    "account": "9568e6ae68a529facc3cf0366cce38ab1c67c4a744c9514c599bf6ef8f626679",
+    "account": "d5bdd38fe760603eaac6821bdc961e296708d2804911c663ea2c79ea581799c3",
     "amount": "3745130",
     "status": "succeeded"
   }
@@ -1701,7 +1701,7 @@ persist `authorized` before delivering against it, and MUST persist
 `spent` before or atomically with delivery, as required by
 {{I-D.payment-intent-session}}.
 
-## Refund Destination
+## Refund Account Control {#refund-account-control}
 
 The default refund destination is the implicit account of the session
 key. Its control is proved by the open signature, so the server never
@@ -1925,7 +1925,7 @@ Payment-Receipt: eyJ...
   "settlementRef": "7YkTGh2vN4qLm8RsE1dXfP5wZc9aJbKu3tHn6VgQ2eUo",
   "refund": {
     "type": "intents",
-    "account": "9568e6ae68a529facc3cf0366cce38ab1c67c4a744c9514c599bf6ef8f626679",
+    "account": "d5bdd38fe760603eaac6821bdc961e296708d2804911c663ea2c79ea581799c3",
     "amount": "3745130",
     "status": "succeeded"
   }
@@ -1961,7 +1961,7 @@ WWW-Authenticate: Payment id="uW4nPq8RyA3sTxM6cZdJgB",
   "settlementRef": "7YkTGh2vN4qLm8RsE1dXfP5wZc9aJbKu3tHn6VgQ2eUo",
   "refund": {
     "type": "intents",
-    "account": "9568e6ae68a529facc3cf0366cce38ab1c67c4a744c9514c599bf6ef8f626679",
+    "account": "d5bdd38fe760603eaac6821bdc961e296708d2804911c663ea2c79ea581799c3",
     "amount": "3745130",
     "status": "succeeded"
   }
@@ -1976,16 +1976,16 @@ An `open` that selects an origin refund to USDC on Base:
 {
   "action": "open",
   "hash": "0x9bcff372aee89b648c922b850573b22387c31d693079f5e37cd255814e2d615a",
-  "sessionKey": "ed25519:B4EXH7JwWCA7G95uaLiCtTt3zLsanE4YNsbajuANGNAt",
+  "sessionKey": "ed25519:FPMiwPws7RmVuqaAqqEwYNaVxf379PBvfmcqMisGbRai",
   "refund": {
     "type": "origin",
     "asset": "eip155:8453/erc20:0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
     "address": "0x2527D02599Ba641c19Fea793Cd0f9A6e8457c317"
   },
-  "signature": "ed25519:7hQw...Nc",
+  "signature": "ed25519:2wGT...P2",
   "voucher": {
     "cumulative": "1000",
-    "signature": "ed25519:3nR2...Kp"
+    "signature": "ed25519:4o66...AB"
   }
 }
 ~~~
@@ -2005,31 +2005,135 @@ handed to the 1Click backend:
 
 # Signing Example {#signing-example}
 
-This example is informative. It shows the bytes an implementation
-hashes for the first voucher of {{open-action}}, with
-`recipient` `merchant.near`.
-
-The JCS-serialized voucher message is:
+This appendix is informative. The vectors below were produced with the
+following test session key. Its seed is published so that
+implementations can reproduce the signatures; the key MUST NOT be used
+for a real session.
 
 ~~~
+seed (hex):
+16fbaea482e27c6a48cdf152b355472781a0aaf1de271437bfe8e8012654894a
+
+sessionKey:
+ed25519:FPMiwPws7RmVuqaAqqEwYNaVxf379PBvfmcqMisGbRai
+
+implicit account:
+d5bdd38fe760603eaac6821bdc961e296708d2804911c663ea2c79ea581799c3
+~~~
+
+Every vector uses `realm` `api.example.com`, NEP-413 `recipient`
+`merchant.near`, and the challenge identifiers, deposit hashes,
+amounts and session `reference` of the examples in this document. For
+each message the vector gives the JCS-serialized message, the SHA-256
+nonce, the SHA-256 digest of the prefixed Borsh payload ({{nep413}}),
+and the signature over that digest. The first vector also gives the
+prefixed Borsh payload in full: the 4-byte tag `9d010080` (2^31 + 413,
+little-endian), the u32 message length, the message bytes, the 32
+nonce bytes, the u32 recipient length, the recipient bytes, and the
+final `00` for the absent `callbackUrl`.
+
+## First Voucher {#vector-voucher}
+
+The first voucher carried by the `open` of {{open-action}}:
+
+~~~
+message:
 {"action":"voucher","cumulative":"1000","currency":"near:mainnet/nep141:17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1","domain":"mpp-nearintents-session-v1","realm":"api.example.com","reference":"eip155:42161:0x76b4c56085ED136a8744D52bE956396624a730E8"}
-~~~
 
-Its SHA-256 nonce is:
-
-~~~
+nonce:
 987dda771aa672e8d3dd6dfc9bde68935cc166afca836932c9df1b625392deb9
-~~~
 
-The prefixed Borsh payload, as hexadecimal, begins with the 4-byte
-tag `9d010080` (2^31 + 413, little-endian), then the u32 message
-length `10010000` (272), the message bytes, the 32 nonce bytes, the
-u32 recipient length `0d000000` (13), the bytes of `merchant.near`,
-and the final `00` for the absent `callbackUrl`. Its SHA-256 digest,
-which the session key signs, is:
+payload (hex):
+9d010080100100007b22616374696f6e223a22766f7563686572222c2263756d
+756c6174697665223a2231303030222c2263757272656e6379223a226e656172
+3a6d61696e6e65742f6e65703134313a31373230383632386638346635643661
+6433336630646133626262656232376666636233393865616335303161333162
+64366164323031316533363133336131222c22646f6d61696e223a226d70702d
+6e656172696e74656e74732d73657373696f6e2d7631222c227265616c6d223a
+226170692e6578616d706c652e636f6d222c227265666572656e6365223a2265
+69703135353a34323136313a3078373662346335363038354544313336613837
+34344435326245393536333936363234613733304538227d987dda771aa672e8
+d3dd6dfc9bde68935cc166afca836932c9df1b625392deb90d0000006d657263
+68616e742e6e65617200
 
-~~~
+digest:
 c2ce8a32fe61a25c19981b3665b6d0607a7a9b850addd2548ae8129ff1f27d3b
+
+signature:
+ed25519:4o66twpTBMPaspJqWzHREVtj85p18YznYRNvPMUyooEZgNeZgiMBJUimEnAV5QRVNN2249ZrYANXrjYcGS3c8TAB
+~~~
+
+## Open {#vector-open}
+
+The open signature of {{open-action}}, with no `refund` object:
+
+~~~
+message:
+{"action":"open","challengeId":"sQ7mT2vLx9KpR4nB8cWdYe","domain":"mpp-nearintents-session-v1","hash":"0x9bcff372aee89b648c922b850573b22387c31d693079f5e37cd255814e2d615a","realm":"api.example.com","sessionKey":"ed25519:FPMiwPws7RmVuqaAqqEwYNaVxf379PBvfmcqMisGbRai"}
+
+nonce:
+cc195ffdf3d32b2db5196aa28dafb29689f6d785b25e848e5eda5c762cc47f5d
+
+digest:
+f15dae1de948f558e6130f88f916fedb67d2636c8e0499254127e44dc95fe628
+
+signature:
+ed25519:4ZghzRsiSXkRmPJmx6T1rAajdLZRYQLpYXzA9uBU6BJLL8UCMhTeULfmSwGPHDWCz5KVnVU4iwaDoSYeTo9iW415
+~~~
+
+## Open with Refund Destination {#vector-open-refund}
+
+The open signature of the origin-refund example in Appendix A, whose
+message carries the `refund` object in JCS key order:
+
+~~~
+message:
+{"action":"open","challengeId":"sQ7mT2vLx9KpR4nB8cWdYe","domain":"mpp-nearintents-session-v1","hash":"0x9bcff372aee89b648c922b850573b22387c31d693079f5e37cd255814e2d615a","realm":"api.example.com","refund":{"address":"0x2527D02599Ba641c19Fea793Cd0f9A6e8457c317","asset":"eip155:8453/erc20:0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913","type":"origin"},"sessionKey":"ed25519:FPMiwPws7RmVuqaAqqEwYNaVxf379PBvfmcqMisGbRai"}
+
+nonce:
+f9261b3ff6514ebeea6a931ca703eb6bfedc6f8da33551c107620a19cdc3836b
+
+digest:
+3bc4519d2d13ec9b2c61a8bf9bc3f0ea7253362de64ffe4386460ca2b4af01e4
+
+signature:
+ed25519:2wGT7UzGW8jTEidLm2vAXWD9EY9UG1PeWxjxLRkdVWNJxMaGRpnHg2bV7fRbWH6LbFVe1eczw8MBSnMuZDwxR9P2
+~~~
+
+## TopUp {#vector-topup}
+
+The topUp signature of {{topup-action}}:
+
+~~~
+message:
+{"action":"topUp","challengeId":"tV3kLm9QxZ2pRwN7bYcHfA","domain":"mpp-nearintents-session-v1","hash":"0x4d1e8a7c3b2f9e6d5c4b3a2918f7e6d5c4b3a29187f6e5d4c3b2a1908f7e6d5c","realm":"api.example.com","reference":"eip155:42161:0x76b4c56085ED136a8744D52bE956396624a730E8"}
+
+nonce:
+26c8b241581d0d15fc9d7548459225b3331806bf7d6ab3ced7fdf262ee32337b
+
+digest:
+66b8a5259cef8fe6d8b7c2dba015a105bfc68d622ab7855a097f7b513ef377fc
+
+signature:
+ed25519:5kTwCLkAKtsf2WZEJ9XpDHpAgdTL4GHBHjb5vg4iCF5E3D68f5mabat7eN9rHGCavhmchtCRtvn8ewtAuNvGj3gH
+~~~
+
+## Close {#vector-close}
+
+The close signature of {{close-action}}:
+
+~~~
+message:
+{"action":"close","domain":"mpp-nearintents-session-v1","realm":"api.example.com","reference":"eip155:42161:0x76b4c56085ED136a8744D52bE956396624a730E8"}
+
+nonce:
+e57103bf3e94bb33256612203a72abf1a5bbabc2ca11a1f2972e777d7c1edd92
+
+digest:
+415c95dc779ea24a70ed208bf6060211eb543e539ff3cfac6d68d7d58d9834b1
+
+signature:
+ed25519:3aw69NKjrzcLxKWuDy3byMv2j4EzcCtSzVhfpFknkkgB6Rt1pP4PXPVwLXJ2JMmvwqVpDtXoajK5MVeAsSagZBUm
 ~~~
 
 # Schema Definitions
